@@ -1,4 +1,5 @@
 shutdown_costmaps: false
+# 是否在导航停止时关闭代价地图（costmaps）。设置为 false 表示即使导航停止，代价地图仍然保持活跃，以便随时恢复导航。
 
 planner_frequency: 2.0
 planner_patience: 5.0
@@ -6,7 +7,21 @@ planner_patience: 5.0
 controller_frequency: 10.0
 controller_patience: 15.0
 
+# 规划器和控制器的运行频率，以及耐心时间
+# 如果在 5 秒内无法找到有效路径，规划器会放弃当前尝试。
+# 如果在 15 秒内无法执行有效运动，控制器会触发恢复行为。
+
 oscillation_timeout: 10.0
 oscillation_distance: 0.2
 
+# 检测振荡（oscillation）的时间阈值（单位：秒）。如果机器人在 10 秒内反复来回移动而无进展，系统会认为它在振荡。
+# 如果机器人在 0.2 米的范围内来回移动，可能会被认为在振荡。
+
 conservative_reset_dist: 3.0
+# 当机器人尝试从受困状态恢复时，会清除周围 3 米范围内的障碍物信息（在代价地图中）。
+
+
+# 机器人导航栈中全局规划器（planner）和局部控制器（controller）的行为，以及一些与导航恢复相关的参数
+
+# robots目录下的文件，turtlebot3是一个机器人模型
+# burger是一个机器人模型的名称，waffle是一个更高级的版本，waffle_pi是一个树莓派版本

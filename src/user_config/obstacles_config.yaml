@@ -16,3 +16,6 @@ obstacles:
       w: 1.00
       d: 0.50
       h: 1.00
+
+# pose: x y z roll pitch yaw
+# m: mass

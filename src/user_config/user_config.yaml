@@ -1,11 +1,13 @@
+# 配置文件，用于设置机器人仿真环境
+# 定义了一个仓库仿真环境的配置，包括地图、机器人设置、路径规划器和插件等内容
 map: "warehouse"
 world: "warehouse"
-rviz_file: "sim_env.rviz"
+rviz_file: "sim_env.rviz"  # 定义仿真环境的可视化方式
 
 robots_config:
-  - robot1_type: "turtlebot3_waffle"
-    robot1_global_planner: "hybrid_astar"
-    robot1_local_planner: "rpp"
+  - robot1_type: "turtlebot3_waffle"  # 一种常用的差速驱动机器人，常用于 ROS 的测试和开发
+    robot1_global_planner: "hybrid_astar"  # 结合了 A* 算法（基于图的搜索）和平滑路径生成的一种规划算法，适合像 TurtleBot3 这样的非完整约束机器人
+    robot1_local_planner: "rpp"  # RPP（反应式路径规划器，Reactive Path Planner），用于实时避障和轨迹跟踪
     robot1_x_pos: "0.0"
     robot1_y_pos: "0.0"
     robot1_z_pos: "0.0"
@@ -50,3 +52,7 @@ plugins:
   # pedestrians: "pedestrian_config.yaml"
   # obstacles: "obstacles_config.yaml"
   map_layers: "map_layers_config.yaml"
+
+
+# 全局规划器：它的目标是找到一条从起点到目标点的“最优”路径（例如最短路径或最安全路径），通常不考虑实时动态变化。例如，在仓库中，全局规划器会规划一条从入口到某个货架的路径。
+# 局部规划器：它的目标是确保机器人能够安全、平滑地沿着全局路径移动，同时应对突发情况（如行人突然出现）。它会根据传感器数据调整速度或方向。

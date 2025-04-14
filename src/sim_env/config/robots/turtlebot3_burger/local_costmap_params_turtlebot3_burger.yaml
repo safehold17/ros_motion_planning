@@ -1,14 +1,18 @@
 global_frame: odom
+# 定义了全局坐标系为odom，表示局部代价地图的参考坐标系是机器人的里程计坐标系。这意味着地图会随着机器人的移动而更新。
 robot_base_frame: base_footprint
+# 定义了机器人的基坐标系为base_footprint，通常是机器人底盘的中心点，用于计算机器人相对于地图的位置。
 
-update_frequency: 2.0
-publish_frequency: 1.0
-transform_tolerance: 0.5  
+update_frequency: 2.0  # 实时更新障碍物的频率
+publish_frequency: 1.0  # 发布代价地图的频率
+transform_tolerance: 0.5  # 如果坐标变换（如从odom到base_footprint）的延迟超过0.5秒，系统会认为数据不可靠。 
 
-static_map: false  
-rolling_window: true
+static_map: false  # 不使用静态地图，局部代价地图通常依赖传感器数据动态生成。
+rolling_window: true  # 启用滚动窗口模式，意味着局部代价地图会以机器人为中心，保持一个固定大小的窗口（而不是覆盖整个环境）。这适合动态环境。
+
+# 局部代价地图的分辨率和大小
 width: 3
 height: 3
-resolution: 0.05
+resolution: 0.05  # 每个网格大小为0。05米
 
-inflation_radius: 3.0
+inflation_radius: 3.0  # 确保机器人不会太靠近障碍物，保守避障

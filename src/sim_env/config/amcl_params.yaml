@@ -1,25 +1,43 @@
 min_particles: 500
 max_particles: 3000
+
 kld_err: 0.02
+# KLD（Kullback-Leibler Divergence）误差阈值，用于自适应调整粒子数量。优化计算效率
+
 update_min_d: 0.20
 update_min_a: 0.20
-resample_interval: 1
-transform_tolerance: 0.5
+# 触发粒子滤波器更新的最小平移距离（米）和最小旋转角度（弧度）。避免频繁更新，降低计算负担
+
+resample_interval: 1  # 每1次更新后进行一次粒子重采样
+transform_tolerance: 0.5  # 传感器数据转换容忍度（秒）。如果传感器数据延迟超过0.5秒，AMCL将忽略该数据
+
 recovery_alpha_slow: 0.00
 recovery_alpha_fast: 0.00
+# 粒子滤波器的恢复参数。用于在定位失败时快速恢复粒子分布
+# 设置为0，表示禁用恢复机制
+
 gui_publish_rate: 50.0
+# GUI（如 RViz）中发布定位数据的频率（单位：Hz）。每秒发布 50 次。
+
 laser_max_range: 3.5
 laser_max_beams: 180
-laser_z_hit: 0.5
-laser_z_short: 0.05
-laser_z_max: 0.05
-laser_z_rand: 0.5
-laser_sigma_hit: 0.2
-laser_lambda_short: 0.1
-laser_likelihood_max_dist: 2.0
-laser_model_type: "likelihood_field"
-odom_model_type: "diff"
-odom_alpha1: 0.1
+# 激光雷达的最大范围（米）和最大激光束数。设置为 3.5 米和 180 个激光束。
+
+laser_z_hit: 0.5 # 激光雷达测量的命中概率。表示激光束命中真实障碍物的概率
+laser_z_short: 0.05 # 激光束测量到比实际距离更短的概率
+laser_z_max: 0.05 # 激光束测量到最大距离的概率
+laser_z_rand: 0.5 # 激光束测量到随机距离的概率， 模拟激光数据中的噪声。
+laser_sigma_hit: 0.2 # 激光束测量误差的标准差
+laser_lambda_short: 0.1 # 短距离误差模型的指数衰减参数。值越小，短距离误差影响越小
+laser_likelihood_max_dist: 2.0 
+laser_model_type: "likelihood_field"  # 激光模型类型，使用似然场模型
+odom_model_type: "diff"  # 里程计模型类型，使用差速驱动模型
+# 里程计模型的参数，用于描述机器人运动模型的噪声特性
+odom_alpha1: 0.1  
 odom_alpha2: 0.1
 odom_alpha3: 0.1
 odom_alpha4: 0.1
+
+
+# AMCL（Adaptive Monte Carlo Localization）算法的参数，用于机器人在已知地图中进行定位。
+# AMCL 是一种基于粒子滤波的定位方法，通过传感器数据（如激光雷达）和里程计数据估计机器人的位置。

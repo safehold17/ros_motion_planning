@@ -116,6 +116,7 @@ namespace spencer_tracking_rviz_plugin {
         void setScale(const float scaleFactor) {
             m_sceneNode->setScale(Ogre::Vector3(scaleFactor, scaleFactor, scaleFactor));
         }
+        // x,y,z 三个轴的缩放因子
 
         void setVisible(bool visible) {
             m_sceneNode->setVisible(visible, true);

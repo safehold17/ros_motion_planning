@@ -24,11 +24,11 @@
 
 #include "common/geometry/vec2d.h"
 
-namespace rmp
+namespace rmp  // ros motion plannign
 {
-namespace common
+namespace common  // common目录下
 {
-namespace math
+namespace math  //math目录下
 {
 constexpr double kMathEpsilon = 1e-10;
 

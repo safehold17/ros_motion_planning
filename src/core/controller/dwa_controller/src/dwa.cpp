@@ -21,27 +21,36 @@ namespace controller
 void DWA::reconfigure(dwa_controller::DWAControllerConfig& config)
 {
   boost::mutex::scoped_lock l(configuration_mutex_);
+  // 确保 DWA::reconfigure 函数的执行是线程安全的。在多线程环境中，多个线程可能同时尝试调用 reconfigure 修改配置参数。如果没有锁保护，可能会导致数据不一致
 
   generator_.setParameters(config.sim_time, config.sim_granularity, config.angular_sim_granularity, config.use_dwa,
                            sim_period_);
 
   double resolution = planner_util_->getCostmap()->getResolution();
   path_distance_bias_ = resolution * config.path_distance_bias;
+  // 机器人轨迹与全局路径（global plan）的接近程度
   // pdistscale used for both path and alignment, set  forward_point_distance to zero to discard alignment
   path_costs_.setScale(path_distance_bias_);
   alignment_costs_.setScale(path_distance_bias_);
 
   goal_distance_bias_ = resolution * config.goal_distance_bias;
+  // 机器人轨迹与局部目标点（local goal，通常是全局路径的子目标）的接近程度
   goal_costs_.setScale(goal_distance_bias_);
   goal_front_costs_.setScale(goal_distance_bias_);
 
   occdist_scale_ = config.occdist_scale;
+  // 障碍物距离缩放因子（Obstacle Distance Scale）
   obstacle_costs_.setScale(occdist_scale_);
 
   stop_time_buffer_ = config.stop_time_buffer;
+  // config 是 dwa_controller::DWAControllerConfig 结构体的一个实例，stop_time_buffer 是其中的一个字段，类型为 double
+  // 在DWAController.cfg中定义了 stop_time_buffer 的默认值为 0.2
+  // 这个参数用于设置在计算机器人轨迹时，考虑的时间缓冲区大小
+
   oscillation_costs_.setOscillationResetDist(config.oscillation_reset_dist, config.oscillation_reset_angle);
   forward_point_distance_ = config.forward_point_distance;
   goal_front_costs_.setXShift(forward_point_distance_);
+  // 调用 goal_front_costs_ 对象的 setXShift方法
   alignment_costs_.setXShift(forward_point_distance_);
 
   // obstacle costs can vary due to scaling footprint feature
@@ -87,8 +96,10 @@ void DWA::reconfigure(dwa_controller::DWAControllerConfig& config)
 }
 
 DWA::DWA(std::string name, base_local_planner::LocalPlannerUtil* planner_util)
+  // 初始化成员变量，调用MapGridCostFunction构造函数的参数
   : planner_util_(planner_util)
   , obstacle_costs_(planner_util->getCostmap())
+  // 这个指针允许访问代价地图的数据
   , path_costs_(planner_util->getCostmap())
   , goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true)
   , goal_front_costs_(planner_util->getCostmap(), 0.0, 0.0, true)
@@ -104,12 +115,14 @@ DWA::DWA(std::string name, base_local_planner::LocalPlannerUtil* planner_util)
   // also allows the frequency to be overwritten locally.
   std::string controller_frequency_param_name;
   if (!private_nh.searchParam("controller_frequency", controller_frequency_param_name))
+  // searchParam用于在参数服务器中搜索指定参数（controller_frequency）并返回其完整名称
+  // controller_frequency_param_name用于储存参数的完成路径
   {
-    sim_period_ = 0.05;
+    sim_period_ = 0.05; //如果没有配置参数，规划器默认周期为0.05秒
   }
   else
   {
-    double controller_frequency = 0;
+    double controller_frequency = 0; //声明一个变量以便读取参数
     private_nh.param(controller_frequency_param_name, controller_frequency, 20.0);
     if (controller_frequency > 0)
     {

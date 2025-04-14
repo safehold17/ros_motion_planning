@@ -40,3 +40,17 @@
     <gazebo_ros gazebo_model_path="${prefix}/.." />
   </export>
 </package>
+
+<!-- 用于定义一个 ROS 软件包（package）的清单文件（manifest） -->
+<!-- 描述了软件包的名称、版本、功能、维护者以及它依赖的其他软件包 -->
+
+<!-- 
+effort_controllers 是ROS 控制框架（ros_control）中的一个控制器包，提供基于力/力矩（effort）的控制器，用于控制机器人的关节或执行器。
+它通常用于物理仿真（如 Gazebo）或真实机器人中，通过向关节施加力或力矩来实现运动。
+
+joint_state_controller 也是 ros_control 框架的一部分，专门用于发布机器人关节状态（joint states）。
+它从硬件接口（或仿真环境）读取关节的当前位置、速度、力/力矩等信息，并通过 ROS 话题发布这些数据。
+
+yocs_cmd_vel_mux（Yujin Open Control System Command Velocity Multiplexer）是一个 ROS 包
+用于多路复用速度命令（geometry_msgs/Twist 消息）。它允许多个输入源（如遥控器、自主导航、键盘控制）发送速度指令，并根据优先级或逻辑选择最终发送给机器人的命令。 
+-->

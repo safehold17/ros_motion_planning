@@ -32,6 +32,9 @@ Controller::Controller()
 {
   odom_helper_ = std::make_shared<base_local_planner::OdometryHelperRos>(odom_frame_);
 }
+// odom_helper_ 是一个 std::shared_ptr（智能指针），指向一个 base_local_planner::OdometryHelperRos 对象
+// 动态分配一个 OdometryHelperRos 对象，并将其绑定到 odom_helper_
+// 这个对象将与里程计坐标系关联，用于处理机器人里程计数据（如速度、位置）
 
 /**
  * @brief Destroy the Controller object
@@ -40,6 +43,7 @@ Controller::~Controller()
 {
   // delete odom_helper_;
 }
+// 析构函数
 
 /**
  * @brief Set or reset obstacle factor
@@ -49,6 +53,8 @@ void Controller::setFactor(double factor)
 {
   factor_ = factor;
 }
+// setter函数，通常返回值为void
+// 用于更新类中成员变量的值
 
 /**
  * @brief Set or reset frame name
@@ -79,9 +85,11 @@ double Controller::regularizeAngle(double angle)
  * @return  yaw
  */
 double Controller::getYawAngle(geometry_msgs::PoseStamped& ps)
+// geometry_msgs::PoseStamped 是 ROS（Robot Operating System）中定义的一种消息类型，属于 geometry_msgs 消息包
+// ps 被用来访问传入的 PoseStamped 对象的字段（pose.orientation），说明 ps 是一个具体的 PoseStamped 实例的引用
 {
   tf2::Quaternion q(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w);
-  tf2::Matrix3x3 m(q);
+  tf2::Matrix3x3 m(q);  //m是旋转矩阵
 
   double roll(0.0), pitch(0.0), yaw(0.0);
   m.getRPY(roll, pitch, yaw);
@@ -100,6 +108,7 @@ bool Controller::shouldRotateToGoal(const geometry_msgs::PoseStamped& cur, const
   return std::hypot(cur.pose.position.x - goal.pose.position.x, cur.pose.position.y - goal.pose.position.y) <
          goal_dist_tol_;
 }
+// std::hypot(a, b) 是 C++ 标准库函数，计算欧几里得距离的平方根，即 sqrt(a^2 + b^2)。在这里，它计算当前位姿与目标位姿在 xy 平面上的直线距离
 
 /**
  * @brief Whether to correct the tracking path with rotation operation
@@ -110,6 +119,8 @@ bool Controller::shouldRotateToPath(double angle_to_path, double tolerance)
 {
   return (tolerance && (angle_to_path > tolerance)) || (!tolerance && (angle_to_path > rotate_tol_));
 }
+// dist_tol_ 表示距离容忍度
+// rotate_tol_ 表示旋转容忍度
 
 /**
  * @brief linear velocity regularization
@@ -133,6 +144,8 @@ double Controller::linearRegularization(nav_msgs::Odometry& base_odometry, doubl
 
   return v_cmd;
 }
+// fabs 计算一个浮点数的绝对值
+// copysign 函数用于返回一个值的绝对值和另一个值的符号
 
 /**
  * @brief angular velocity regularization
@@ -172,6 +185,7 @@ void Controller::transformPose(tf2_ros::Buffer* tf, const std::string out_frame,
   tf->transform(in_pose, out_pose, out_frame);
   out_pose.header.frame_id = out_frame;
 }
+// 将输入位姿从其坐标系转换到目标坐标系
 
 /**
  * @brief Tranform from world map(x, y) to costmap(x, y)
@@ -189,6 +203,7 @@ bool Controller::worldToMap(double wx, double wy, int& mx, int& my)
   my = static_cast<int>(my_u);
   return flag;
 }
+// 将世界坐标系（地图）转换为代价地图
 
 /**
  * @brief Prune the path, removing the waypoints that the robot has already passed and distant waypoints
@@ -200,6 +215,10 @@ std::vector<geometry_msgs::PoseStamped> Controller::prune(const geometry_msgs::P
   auto calPoseDistance = [](const geometry_msgs::PoseStamped& ps_1, const geometry_msgs::PoseStamped& ps_2) {
     return std::hypot(ps_1.pose.position.x - ps_2.pose.position.x, ps_1.pose.position.y - ps_2.pose.position.y);
   };
+  // 函数返回一个 std::vector，其中每个元素是 geometry_msgs::PoseStamped 类型
+  // 参数名为 robot_pose_global，类型为 geometry_msgs::PoseStamped，并且是 const 的，表示函数不会修改这个参数
+  // 这是一个完整的 Lambda 表达式，用于定义一个匿名函数 calPoseDistance
+  // 空捕获列表 [] 表示不依赖外部变量，参数通过 ps_1 和 ps_2 传入
 
   /**
    * @brief Find the first element in iterator that is greater integrated distance than compared value
@@ -259,6 +278,7 @@ std::vector<geometry_msgs::PoseStamped> Controller::prune(const geometry_msgs::P
   auto transform_begin =
       getMinFuncVal(global_plan_.begin(), closest_pose_upper_bound,
                     [&](const geometry_msgs::PoseStamped& ps) { return calPoseDistance(robot_pose_global, ps); });
+                    // [捕获列表](参数列表) -> 返回类型 { 函数体 }
 
   // Transform the near part of the global plan into the robot's frame of reference.
   std::vector<geometry_msgs::PoseStamped> prune_path;

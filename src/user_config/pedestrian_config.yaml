@@ -1,15 +1,16 @@
 # sfm algorithm configure
+# 设置 SFM（Social Force Model，社会力模型）算法 的参数，主要用于模拟行人（pedestrians）的行为和运动轨迹。它通常应用在机器人导航、人群模拟或路径规划等场景中。
 social_force:
-  animation_factor: 5.1
+  animation_factor: 5.1  # 动画因子，可能用于调整模拟的平滑性或可视化效果，值越大可能表示更强的动画插值效果。
   # only handle pedestrians within `people_distance`
-  people_distance: 6.0
+  people_distance: 6.0  # 表示行人之间的感知范围（单位可能是米）。模型只会处理距离当前行人 6.0 单位内的其他行人，超出此范围的行人不会影响计算。
   # weights of social force model
-  goal_weight: 2.0
-  obstacle_weight: 20.0
-  social_weight: 15
-  group_gaze_weight: 3.0
-  group_coh_weight: 2.0
-  group_rep_weight: 1.0
+  goal_weight: 2.0  # 目标吸引力权重，表示行人朝目标点移动的驱动力强度。
+  obstacle_weight: 20.0  # 障碍物斥力权重，表示行人避开障碍物的倾向，值较高（20.0）说明避障优先级很高。
+  social_weight: 15  # 社会斥力权重，表示行人之间保持距离的倾向，避免碰撞或过于靠近。
+  group_gaze_weight: 3.0  # 群体凝视权重，表示行人之间的相互吸引力，可能用于模拟人群中的社交行为。
+  group_coh_weight: 2.0  # 群体凝聚力权重，表示群体成员之间保持靠近的倾向。
+  group_rep_weight: 1.0  # 群体斥力权重，表示群体内部个体之间避免过于靠近的倾向。
 
 # pedestrians setting
 pedestrians:
@@ -19,7 +20,7 @@ pedestrians:
       pose: 3 2 1 0 0 0
       velocity: 0.9
       radius: 0.4
-      cycle: true
+      cycle: true  # 表示行人会在目标点之间循环移动。
       ignore:
         model_1: ground_plane
         model_2: turtlebot3_waffle

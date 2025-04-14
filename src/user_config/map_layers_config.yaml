@@ -1,11 +1,11 @@
 # maps layers configure
-global_costmap:
-  - static_map
-  - obstacle_layer
-  - voronoi_layer
-  - inflation_layer
+global_costmap:  # 定义了全局代价地图使用的层。全局代价地图通常覆盖整个地图范围，更新频率较低，用于全局规划器（如 A*、RRT 等）计算从起点到目标的路径。
+  - static_map  # 静态地图层，从预先构建的地图数据（通常通过 SLAM 生成）加载环境信息。
+  - obstacle_layer  # 障碍物层，从传感器数据（如激光雷达、深度相机）中动态更新障碍物信息。
+  - voronoi_layer  # Voronoi 图层，基于 Voronoi 图算法生成路径或区域，通常用于路径规划中寻找远离障碍物的安全路线。
+  - inflation_layer  # 膨胀层，将障碍物周围的区域标记为高代价区域，以避免机器人靠近障碍物。膨胀层通常用于局部规划器（如 DWA、TEB 等）计算安全路径。
 
-# local_costmap:
+# local_costmap:  # 局部代价地图关注机器人周围的小范围区域，更新频率较高，用于局部规划器（如 DWA、PID 等）调整实时路径。
 #   - static_map
 #   - obstacle_layer
 #   - inflation_layer

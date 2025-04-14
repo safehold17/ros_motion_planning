@@ -39,3 +39,8 @@ plugins:
   # pedestrians: "pedestrian_config.yaml"
   # obstacles: "obstacles_config.yaml"
   map_layers: "map_layers_config.yaml"
+
+
+# lazy 规划器。这是一种“懒惰”规划方法，可能推迟路径计算，直到必要时才生成路径（例如当目标明确或环境发生变化时）。相比之前的 hybrid_astar，lazy 可能更适合动态或不确定环境，减少初始计算开销。
+# orca（Optimal Reciprocal Collision Avoidance，最优互斥碰撞避免）。
+#ORCA 是一种多智能体避障算法，特别适合多机器人场景，能够高效协调多个机器人之间的运动，避免碰撞。与之前的 rpp（反应式路径规划器）相比，ORCA 更强调多机器人协作。

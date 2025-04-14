@@ -23,3 +23,5 @@ odom_alpha1: 0.1
 odom_alpha2: 0.1
 odom_alpha3: 0.1
 odom_alpha4: 0.1
+
+# 与config根目录下的amcl_params.yaml文件中的参数一致
