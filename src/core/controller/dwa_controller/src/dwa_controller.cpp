@@ -18,6 +18,8 @@ namespace rmp
 namespace controller
 {
 void DWAController::reconfigureCB(dwa_controller::DWAControllerConfig& config, uint32_t level)
+// 由 ROS 动态重配置机制生成，用于在运行时传递用户设置的参数值
+// level 可用于优化，仅处理发生变化的参数
 {
   if (setup_ && config.restore_defaults)
   {
@@ -29,9 +31,12 @@ void DWAController::reconfigureCB(dwa_controller::DWAControllerConfig& config, u
     default_config_ = config;
     setup_ = true;
   }
+  // setup_的初始化在后面
+  // default_config_的初始值在哪里？？？
 
   // update generic local planner params
   base_local_planner::LocalPlannerLimits limits;
+  // limits 是一个临时的 LocalPlannerLimits 对象，通过从 config 复制通用参数（如速度、加速度、容差）创建
   limits.max_vel_trans = config.max_vel_trans;
   limits.min_vel_trans = config.min_vel_trans;
   limits.max_vel_x = config.max_vel_x;
@@ -58,6 +63,7 @@ void DWAController::reconfigureCB(dwa_controller::DWAControllerConfig& config, u
 DWAController::DWAController() : initialized_(false), odom_helper_("odom"), setup_(false)
 {
 }
+// 参数初始化
 
 void DWAController::initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d::Costmap2DROS* costmap_ros)
 {
@@ -66,17 +72,22 @@ void DWAController::initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d
     ros::NodeHandle private_nh("~/" + name);
     g_plan_pub_ = private_nh.advertise<nav_msgs::Path>("global_plan", 1);
     l_plan_pub_ = private_nh.advertise<nav_msgs::Path>("local_plan", 1);
+    // "global_plan" 和 "local_plan" 是 ROS 中的主题名称，用于发布全局和局部路径规划结果
     tf_ = tf;
     costmap_ros_ = costmap_ros;
     costmap_ros_->getRobotPose(current_pose_);
 
     // make sure to update the costmap we'll use for this cycle
     costmap_2d::Costmap2D* costmap = costmap_ros_->getCostmap();
-
+    //获取 costmap
+    
     planner_util_.initialize(tf, costmap, costmap_ros_->getGlobalFrameID());
 
     // create the actual planner that we'll use.. it'll configure itself from the parameter server
     dp_ = boost::shared_ptr<DWA>(new DWA(name, &planner_util_));
+    // 创建一个 DWA 对象，初始化 DWA 算法的核心逻辑
+    // 使用 boost::shared_ptr 管理 DWA 对象的内存，赋值给 dp_
+    // 传递 name 和 planner_util_ 作为构造函数参数，设置 DWA 的命名空间和数据访问接口
 
     if (private_nh.getParam("odom_topic", odom_topic_))
     {
@@ -91,6 +102,8 @@ void DWAController::initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d
     dynamic_reconfigure::Server<dwa_controller::DWAControllerConfig>::CallbackType cb =
         boost::bind(&DWAController::reconfigureCB, this, _1, _2);
     dsrv_->setCallback(cb);
+    // 设置动态重配置服务器，允许运行时调整 DWAController 的参数
+    // 通过 reconfigureCB，将用户修改的参数应用于规划器（planner_util_ 和 dp_）
   }
   else
   {
@@ -107,6 +120,9 @@ bool DWAController::setPlan(const std::vector<geometry_msgs::PoseStamped>& orig_
   }
   // when we get a new plan, we also want to clear any latch we may have on goal tolerances
   latchedStopRotateController_.resetLatching();
+  // 调用 LatchedStopRotateController 的 resetLatching 方法，重置目标容差的锁存状态
+  // 确保在接收新全局路径时，规划器重新评估目标是否接近，而不是依赖旧的锁存状态
+  // 锁存状态用于记录机器人是否已经接近目标（在目标容差范围内），并“锁定”这一状态以避免反复调整或震荡行为
 
   ROS_INFO("Got new plan");
   return dp_->setPlan(orig_global_plan);

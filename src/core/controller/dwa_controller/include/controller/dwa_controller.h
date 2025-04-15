@@ -104,6 +104,9 @@ private:
   base_local_planner::LocalPlannerUtil planner_util_;
 
   boost::shared_ptr<DWA> dp_;  ///< @brief The trajectory controller
+  // boost::shared_ptr<DWA> dp_ 是一个智能指针，指向动态分配的 DWA 对象
+  // 通过引用计数自动管理 DWA 对象的内存，确保对象在不再需要时被释放
+  // 避免了手动 delete 的复杂性和错误风险，支持共享所有权和异常安全
 
   costmap_2d::Costmap2DROS* costmap_ros_;
 
