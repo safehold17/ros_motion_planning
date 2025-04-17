@@ -1,0 +1,136 @@
+{
+  "type": "float-area",
+  "_widgets": [
+    [
+      {
+        "widget": {
+          "constructionOptions": {
+            "factoryId": "code-editor-opener",
+            "options": {
+              "kind": "navigatable",
+              "uri": "file:///c%3A/Users/clx/Documents/RMP/ros_motion_planning/src/core/controller/dwa_controller/src/dwa.cpp",
+              "floatAreaId": "c9d5696b-32dc-48cb-853f-32edef36dc6d"
+            }
+          },
+          "innerWidgetState": {
+            "cursorState": [
+              {
+                "inSelectionMode": false,
+                "selectionStart": {
+                  "lineNumber": 223,
+                  "column": 15
+                },
+                "position": {
+                  "lineNumber": 223,
+                  "column": 15
+                }
+              }
+            ],
+            "viewState": {
+              "scrollLeft": 0,
+              "firstPosition": {
+                "lineNumber": 6,
+                "column": 1
+              },
+              "firstPositionDeltaTop": -5
+            },
+            "contributionsState": {
+              "editor.contrib.folding": {
+                "collapsedRegions": [
+                  {
+                    "startLineNumber": 21,
+                    "endLineNumber": 97
+                  },
+                  {
+                    "startLineNumber": 101,
+                    "endLineNumber": 187
+                  },
+                  {
+                    "startLineNumber": 192,
+                    "endLineNumber": 206
+                  },
+                  {
+                    "startLineNumber": 208,
+                    "endLineNumber": 214
+                  },
+                  {
+                    "startLineNumber": 248,
+                    "endLineNumber": 299
+                  },
+                  {
+                    "startLineNumber": 309,
+                    "endLineNumber": 413
+                  }
+                ],
+                "lineCount": 419,
+                "provider": "syntax",
+                "foldedImports": false
+              },
+              "editor.contrib.wordHighlighter": false
+            }
+          }
+        },
+        "width": 750,
+        "height": 959,
+        "spacing": 0
+      }
+    ],
+    [
+      {
+        "widget": {
+          "constructionOptions": {
+            "factoryId": "code-editor-opener",
+            "options": {
+              "kind": "navigatable",
+              "uri": "file:///c%3A/Users/clx/Documents/RMP/ros_motion_planning/src/core/controller/dwa_controller/include/controller/dwa.h",
+              "floatAreaId": "c9d5696b-32dc-48cb-853f-32edef36dc6d"
+            }
+          },
+          "innerWidgetState": {
+            "cursorState": [
+              {
+                "inSelectionMode": false,
+                "selectionStart": {
+                  "lineNumber": 142,
+                  "column": 47
+                },
+                "position": {
+                  "lineNumber": 142,
+                  "column": 47
+                }
+              }
+            ],
+            "viewState": {
+              "scrollLeft": 0,
+              "firstPosition": {
+                "lineNumber": 133,
+                "column": 1
+              },
+              "firstPositionDeltaTop": -8
+            },
+            "contributionsState": {
+              "editor.contrib.folding": {
+                "lineCount": 155,
+                "provider": "syntax",
+                "foldedImports": false
+              },
+              "editor.contrib.wordHighlighter": false
+            }
+          }
+        },
+        "width": 869,
+        "height": 450,
+        "spacing": 0
+      }
+    ]
+  ],
+  "_widths": [
+    750,
+    869
+  ],
+  "_modelData": {
+    "connections": [],
+    "annotations": [],
+    "highlights": []
+  }
+}

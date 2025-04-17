@@ -18,8 +18,8 @@ namespace rmp
 namespace controller
 {
 void DWAController::reconfigureCB(dwa_controller::DWAControllerConfig& config, uint32_t level)
-// 由 ROS 动态重配置机制生成，用于在运行时传递用户设置的参数值
-// level 可用于优化，仅处理发生变化的参数
+  // 由 ROS 动态重配置机制生成，用于在运行时传递用户设置的参数值
+  // level 可用于优化，仅处理发生变化的参数
 {
   if (setup_ && config.restore_defaults)
   {
@@ -59,6 +59,7 @@ void DWAController::reconfigureCB(dwa_controller::DWAControllerConfig& config, u
   // update dwa specific configuration
   dp_->reconfigure(config);
 }
+// 通过 ROS 的动态重配置机制，允许用户在运行时调整参数
 
 DWAController::DWAController() : initialized_(false), odom_helper_("odom"), setup_(false)
 {
@@ -110,6 +111,9 @@ void DWAController::initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d
     ROS_WARN("This planner has already been initialized, doing nothing.");
   }
 }
+// 初始化与 ROS 的接口，如 tf（坐标变换缓冲区）、costmap（代价地图）等。
+// 创建 DWA 对象（dp_），这是 DWA 算法的核心实现。
+// 设置动态重配置服务器，绑定 reconfigureCB 回调函数。
 
 bool DWAController::setPlan(const std::vector<geometry_msgs::PoseStamped>& orig_global_plan)
 {
@@ -127,6 +131,8 @@ bool DWAController::setPlan(const std::vector<geometry_msgs::PoseStamped>& orig_
   ROS_INFO("Got new plan");
   return dp_->setPlan(orig_global_plan);
 }
+// 接收全局路径（orig_global_plan），并传递给 dp_->setPlan。
+// 重置目标容差的锁存状态（latchedStopRotateController_.resetLatching()），确保新路径生效。
 
 bool DWAController::isGoalReached()
 {
@@ -169,6 +175,7 @@ DWAController::~DWAController()
 }
 
 bool DWAController::dwaComputeVelocityCommands(geometry_msgs::PoseStamped& global_pose, geometry_msgs::Twist& cmd_vel)
+// cmd_vel表示控制机器人移动的速度指令
 {
   // dynamic window sampling approach to get useful velocity commands
   if (!isInitialized())
@@ -189,6 +196,7 @@ bool DWAController::dwaComputeVelocityCommands(geometry_msgs::PoseStamped& globa
   // compute what trajectory to drive along
   geometry_msgs::PoseStamped drive_cmds;
   drive_cmds.header.frame_id = costmap_ros_->getBaseFrameID();
+  // 指定坐标系为机器人的基座坐标系 ID
 
   // call with updated footprint
   base_local_planner::Trajectory path = dp_->findBestPath(global_pose, robot_vel, drive_cmds);
@@ -206,6 +214,7 @@ bool DWAController::dwaComputeVelocityCommands(geometry_msgs::PoseStamped& globa
   cmd_vel.linear.x = drive_cmds.pose.position.x;
   cmd_vel.linear.y = drive_cmds.pose.position.y;
   cmd_vel.angular.z = tf2::getYaw(drive_cmds.pose.orientation);
+  // 速度为什么能等于位置？？？
 
   // if we cannot move... tell someone
   std::vector<geometry_msgs::PoseStamped> local_plan;
@@ -216,6 +225,8 @@ bool DWAController::dwaComputeVelocityCommands(geometry_msgs::PoseStamped& globa
                     "can mean there is an obstacle too close to the robot.");
     local_plan.clear();
     publishLocalPlan(local_plan);
+    // 清空当前的局部路径
+    // 向系统发布一个空的局部路径
     return false;
   }
 
@@ -245,8 +256,13 @@ bool DWAController::dwaComputeVelocityCommands(geometry_msgs::PoseStamped& globa
   publishLocalPlan(local_plan);
   return true;
 }
+// 获取机器人当前位姿和速度。
+// 调用 dp_->findBestPath 生成最佳轨迹。
+// 将最佳轨迹的速度命令转换为 cmd_vel（线速度和角速度）。
+// 发布局部路径供可视化。
 
 bool DWAController::computeVelocityCommands(geometry_msgs::Twist& cmd_vel)
+// cmd_vel 在函数调用时是一个空的或未初始化的变量，函数的目的是通过 DWA 算法计算速度命令并填充到 cmd_vel 中
 {
   // dispatches to either dwa sampling control or stop and rotate control, depending on whether we have been close
   // enough to goal
@@ -264,11 +280,13 @@ bool DWAController::computeVelocityCommands(geometry_msgs::Twist& cmd_vel)
 
   // if the global plan passed in is empty... we won't do anything
   if (transformed_plan.empty())
+  // 检查是否为空
   {
     ROS_WARN_NAMED("dwa_local_planner", "Received an empty transformed plan.");
     return false;
   }
   ROS_DEBUG_NAMED("dwa_local_planner", "Received a transformed plan with %zu points.", transformed_plan.size());
+  // .size() 返回其中包含的元素个数
 
   // update plan in dwa_planner even if we just stop and rotate, to allow checkTrajectory
   dp_->updatePlanAndLocalCosts(current_pose_, transformed_plan, costmap_ros_->getRobotFootprint());
@@ -280,10 +298,13 @@ bool DWAController::computeVelocityCommands(geometry_msgs::Twist& cmd_vel)
     std::vector<geometry_msgs::PoseStamped> transformed_plan;
     publishGlobalPlan(transformed_plan);
     publishLocalPlan(local_plan);
+    // 创建并发布空的全局路径和局部路径
     base_local_planner::LocalPlannerLimits limits = planner_util_.getCurrentLimits();
     return latchedStopRotateController_.computeVelocityCommandsStopRotate(
         cmd_vel, limits.getAccLimits(), dp_->getSimPeriod(), &planner_util_, odom_helper_, current_pose_,
         boost::bind(&DWA::checkTrajectory, dp_, _1, _2, _3));
+        // 绑定 DWA（动态窗口法）规划器的 checkTrajectory 方法，用于验证生成的轨迹是否可行
+        // 如果机器人位置正确但朝向不匹配目标朝向，会生成旋转命令调整朝向
   }
   else
   {
@@ -301,6 +322,9 @@ bool DWAController::computeVelocityCommands(geometry_msgs::Twist& cmd_vel)
     return isOk;
   }
 }
+// 根据机器人是否接近目标，决定使用 DWA 算法还是停止旋转控制。
+// 如果接近目标（isPositionReached 为真），调用 latchedStopRotateController_ 生成旋转命令调整朝向。
+// 否则，调用 dwaComputeVelocityCommands 执行 DWA 算法。
 
 };  // namespace controller
 }  // namespace rmp

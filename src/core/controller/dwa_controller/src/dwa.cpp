@@ -95,6 +95,8 @@ void DWA::reconfigure(dwa_controller::DWAControllerConfig& config)
   vsamples_[1] = vy_samp;
   vsamples_[2] = vth_samp;
 }
+// 配置轨迹生成参数（如仿真时间 sim_time、速度采样数量 vx_samples 等）。
+// 设置成本函数权重（如路径偏离成本 path_distance_bias_、障碍物成本 occdist_scale_ 等）。
 
 DWA::DWA(std::string name, base_local_planner::LocalPlannerUtil* planner_util)
   // 初始化成员变量，调用MapGridCostFunction构造函数的参数
@@ -183,6 +185,8 @@ DWA::DWA(std::string name, base_local_planner::LocalPlannerUtil* planner_util)
 
   private_nh.param("cheat_factor", cheat_factor_, 1.0);
 }
+// 初始化轨迹生成器 generator_ 和多种成本函数（如 obstacle_costs_、path_costs_ 等）
+// 设置规划周期 sim_period_（默认 0.05 秒，可通过参数 controller_frequency 调整）
 
 // used for visualization only, total_costs are not really total costs
 bool DWA::getCellCosts(int cx, int cy, float& path_cost, float& goal_cost, float& occ_cost, float& total_cost)
@@ -293,6 +297,9 @@ void DWA::updatePlanAndLocalCosts(const geometry_msgs::PoseStamped& global_pose,
     alignment_costs_.setScale(0.0);
   }
 }
+// 更新全局路径（global_plan_）和局部成本函数。
+// 设置路径成本（path_costs_）、目标成本（goal_costs_）等的目标点。
+// 调整对齐成本（alignment_costs_），当接近目标时禁用以避免不稳定。
 
 /*
  * given the current state of the robot, find a good trajectory
@@ -300,6 +307,7 @@ void DWA::updatePlanAndLocalCosts(const geometry_msgs::PoseStamped& global_pose,
 base_local_planner::Trajectory DWA::findBestPath(const geometry_msgs::PoseStamped& global_pose,
                                                  const geometry_msgs::PoseStamped& global_vel,
                                                  geometry_msgs::PoseStamped& drive_velocities)
+                                                 
 {
   // make sure that our configuration doesn't change mid-run
   boost::mutex::scoped_lock l(configuration_mutex_);
@@ -403,5 +411,9 @@ base_local_planner::Trajectory DWA::findBestPath(const geometry_msgs::PoseStampe
 
   return result_traj_;
 }
+// 初始化轨迹生成器 generator_，基于当前位置、速度和目标。
+// 使用 scored_sampling_planner_ 采样并评分所有轨迹。
+// 返回评分最高的轨迹（result_traj_）。
+
 };  // namespace controller
 }  // namespace rmp

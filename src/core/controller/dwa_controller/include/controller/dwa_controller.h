@@ -116,6 +116,8 @@ private:
   geometry_msgs::PoseStamped current_pose_;
 
   base_local_planner::LatchedStopRotateController latchedStopRotateController_;
+  // 负责处理机器人在接近目标时的停止和旋转行为，确保机器人能够准确地停在目标位置并调整到正确的朝向
+  // 同时避免在目标附近出现反复调整或震荡的情况
 
   bool initialized_;
 
